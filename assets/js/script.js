@@ -45,6 +45,20 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+
+
+// remove all tasks
+$("#remove-tasks").on("click", function() {
+  for (var key in tasks) {
+    tasks[key].length = 0;
+    $("#list-" + key).empty();
+  }
+  saveTasks();
+});
+
+// load tasks for the first time
+loadTasks();
+
 $(".list-group").on("click", "p", function() {
   var text = $(this)
   .text()
@@ -73,7 +87,7 @@ $(".list-group").on("blur", "textarea", function() {
   tasks[status][index].text = text;
   saveTasks();
   // recreate p element
-  var taskP = $("<p>")
+   var taskP = $("<p>")
   .addClass("m-1")
   .text(text);
 });
@@ -122,7 +136,50 @@ $(".list-group").on("blur", "input[type='text']", function() {
   $(this).replaceWith(taskSpan);
 });
 
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function(event) {
+    
+  },
+  deactivate: function(event) {
+    
+  },
+  over: function(event) {
+    
+  },
+  out: function(event) {
+    
+  },
+  update: function(event) {
+    var tempArr = [];
+    //loop over current set of children in list
+    $(this).children().each(function() {
+      var text = $(this)
+      .find("p")
+      .text()
+      .trim();
 
+      var date = $(this)
+      .find("span")
+      .text()
+      .trim();
+
+      tempArr.push({
+        text: text,
+        date: date
+      }); 
+    });
+    var arrName = $(this)
+    .attr("id")
+    .replace("list-", "");
+
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
 
 
 
@@ -160,16 +217,19 @@ $("#task-form-modal .btn-primary").click(function() {
   }
 });
 
-// remove all tasks
-$("#remove-tasks").on("click", function() {
-  for (var key in tasks) {
-    tasks[key].length = 0;
-    $("#list-" + key).empty();
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    console.log("drop");
+    ui.draggable.remove();
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
   }
-  saveTasks();
 });
-
-// load tasks for the first time
-loadTasks();
 
 
